@@ -2,28 +2,29 @@ use super::handler;
 use super::errors;
 use crate::handler::Handler;
 
-#[derive(Copy, Clone)]
 struct EventHandler<'a>{
-    handler_name: &'a str,
-    chained_handler: &'a dyn handler::Handler<'a>,
+    handler_name: String,
+    chained_handler: &'a mut dyn handler::Handler<'a>,
+    error_count: u32,
 }
 
 impl <'a> EventHandler<'a>{
-    pub fn chained(id:&'a str,h: &'a dyn handler::Handler<'a>) ->EventHandler<'a>{
-        EventHandler{handler_name: id,chained_handler:h}
+    pub fn chained(id:String,h: &'a mut dyn handler::Handler<'a>) ->EventHandler<'a>{
+        EventHandler{handler_name: id,chained_handler:h,error_count:0}
     }
 
 }
 
 impl<'a> handler::Handler<'a> for EventHandler<'a>{
-    fn name(&self)-> &str{
+    fn name(&self)-> String{
         self.handler_name
     }
 
-    fn handle(&self,level:u32,mut err: Option<handler::HandlerError>,message:String) ->  Option<handler::HandlerError>{
+    fn handle(&mut self,level:u32,mut err: Option<handler::HandlerError>,message:String) ->  Option<handler::HandlerError>{
 
         println!("door handler {}",err.as_ref().unwrap().err);
         if err.is_some(){
+            self.error_count+=1;
             let code = err.as_ref().unwrap().err;
             match code{
                 errors::DOOR_WONT_OPEN =>{
@@ -48,10 +49,10 @@ impl<'a> handler::Handler<'a> for EventHandler<'a>{
 
 }
 
-pub fn check_door<'a>(h: &'a impl handler::Handler<'a>) -> Option<handler::HandlerError>{
+pub fn check_door<'a>(h: &'a mut dyn handler::Handler<'a>) -> Option<handler::HandlerError>{
         
     println!("check door");
-    let ch = EventHandler::chained("check_door",h);
+    let mut ch = EventHandler::chained("check_door".to_string(),h);
     let mut err = open_door();
 
     if err.is_some(){

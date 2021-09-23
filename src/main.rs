@@ -4,25 +4,24 @@ mod handler;
 mod errors;
 use crate::handler::Handler;
 
-#[derive(Copy, Clone)]
-struct EventHandler<'a>{
-    handler_name: &'a str,
+pub struct EventHandler{
+    pub handler_name: String,
 }
 
-impl EventHandler<'_>{
-    pub fn new(id:& str) ->EventHandler{
+impl  EventHandler{
+     pub fn new(id:String) ->  dyn handler::Handler{
+
         EventHandler{handler_name: id}
-    }
+     }
 }
 
-impl<'a> handler::Handler<'a> for EventHandler<'a>{
+impl<'a> handler::Handler<'a> for EventHandler{
 
-    fn name(&self)-> &str{
+    fn name(&self)-> String{
         self.handler_name
     }
 
-    fn handle(&self,level:u32,err: Option<handler::HandlerError>,message:String) ->  Option<handler::HandlerError>{
-
+    fn handle(&mut self,level:u32,err: Option<handler::HandlerError>,message:String) ->  Option<handler::HandlerError>{
         if err.is_none(){
             return None;
         }
@@ -40,7 +39,6 @@ impl<'a> handler::Handler<'a> for EventHandler<'a>{
                      _ => {}    
                 }
             }
-
             _ => {
                 match code{
                      errors::DOOR_WONT_CLOSE =>{
@@ -54,42 +52,48 @@ impl<'a> handler::Handler<'a> for EventHandler<'a>{
             }
         }
         println!("MainHandler {} {} in {}",level,message,self.name());
-
         if level == handler::FATAL{
             assert!(false);
         }
-  
-        err
+         err
     }
-    
-
-}
+ }
 
 fn main(){
 
-    let  myhandler = EventHandler::new("main");
+    let mut h = EventHandler::new("main".to_string())  ;
+    let &mut  myhandler: dyn handler::Handler = h;
 
-    let mut err = door::check_door(&myhandler);
- 
-    err = myhandler.handle(handler::ERROR,err,"main check door failed".to_string());
+    run(&myhandler);
 
-    if err.is_some(){
-        println!("unhandled error");
-        assert!(false);
-    }
-  
-    err = door::open_door();
-    err = myhandler.handle(handler::ERROR,err,"main cannot open door".to_string());
-    if err.is_some(){
-        println!("unhandled error");
-        assert!(false);
-    }
-    err = door::close_door();
-
-    err = myhandler.handle(handler::ERROR,err,"main cannot close door".to_string());
-    if err.is_some(){
-        println!("unhandled error");
-        assert!(false);
-    }
-    
 }
+
+fn run(myhandler: &mut dyn handler::Handler){
+}
+
+// fn run(myhandler: &mut dyn handler::Handler){
+
+//     let mut err = door::check_door(myhandler);
+ 
+//     err = myhandler.handle(handler::ERROR,err,"main check door failed".to_string());
+
+//     if err.is_some(){
+//         println!("unhandled error");
+//         assert!(false);
+//     }
+  
+//     err = door::open_door();
+//     err = myhandler.handle(handler::ERROR,err,"main cannot open door".to_string());
+//     if err.is_some(){
+//         println!("unhandled error");
+//         assert!(false);
+//     }
+//     err = door::close_door();
+
+//     err = myhandler.handle(handler::ERROR,err,"main cannot close door".to_string());
+//     if err.is_some(){
+//         println!("unhandled error");
+//         assert!(false);
+//     }
+    
+// }
