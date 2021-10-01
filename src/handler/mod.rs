@@ -7,7 +7,7 @@ pub struct HandlerError{
     pub  origin: String, 
 }   
 
-pub trait Handler<'a>{
+pub trait Handler{
     fn name(&self) ->String;
     fn handle(&mut self,level:u32,err: Option<HandlerError>,message:String) 
         -> Option<HandlerError>{

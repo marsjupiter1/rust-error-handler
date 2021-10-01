@@ -2,20 +2,20 @@ use super::handler;
 use super::errors;
 use crate::handler::Handler;
 
-struct EventHandler<'a>{
+struct EventHandler{
     handler_name: String,
-    chained_handler: &'a mut dyn handler::Handler<'a>,
+    chained_handler: Box<dyn handler::Handler>,
     error_count: u32,
 }
 
-impl <'a> EventHandler<'a>{
-    pub fn chained(id:String,h: &'a mut dyn handler::Handler<'a>) ->EventHandler<'a>{
-        EventHandler{handler_name: id,chained_handler:h,error_count:0}
+impl  EventHandler{
+    pub fn chained(id:String,h: Box<dyn handler::Handler>) -> Box<dyn handler::Handler>{
+        Box::new(EventHandler{handler_name: id,chained_handler:h,error_count:0})
     }
 
 }
 
-impl<'a> handler::Handler<'a> for EventHandler<'a>{
+impl  handler::Handler for EventHandler{
     fn name(&self)-> String{
         self.handler_name
     }
@@ -49,7 +49,7 @@ impl<'a> handler::Handler<'a> for EventHandler<'a>{
 
 }
 
-pub fn check_door<'a>(h: &'a mut dyn handler::Handler<'a>) -> Option<handler::HandlerError>{
+pub fn check_door(h:Box<dyn handler::Handler>) -> Option<handler::HandlerError>{
         
     println!("check door");
     let mut ch = EventHandler::chained("check_door".to_string(),h);

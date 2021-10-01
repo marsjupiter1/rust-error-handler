@@ -1,24 +1,27 @@
 
 mod door;
-mod handler;
+
 mod errors;
-use crate::handler::Handler;
+mod handler;
 
-pub struct EventHandler{
-    pub handler_name: String,
+struct EventHandler{
+    
+
 }
 
-impl  EventHandler{
-     pub fn new(id:String) ->  dyn handler::Handler{
 
-        EventHandler{handler_name: id}
-     }
+
+impl EventHandler{
+    pub fn new() ->  Box<dyn handler::Handler>{
+//pub fn newdoorhandler() ->  Box<dyn Mandler>{
+        Box::new(EventHandler{ })
+    }
 }
 
-impl<'a> handler::Handler<'a> for EventHandler{
+impl handler::Handler for EventHandler{
 
     fn name(&self)-> String{
-        self.handler_name
+        "main".to_string()
     }
 
     fn handle(&mut self,level:u32,err: Option<handler::HandlerError>,message:String) ->  Option<handler::HandlerError>{
@@ -61,14 +64,13 @@ impl<'a> handler::Handler<'a> for EventHandler{
 
 fn main(){
 
-    let mut h = EventHandler::new("main".to_string())  ;
-    let &mut  myhandler: dyn handler::Handler = h;
-
-    run(&myhandler);
+    let h = EventHandler::new()  ;
+   
+    run(h);
 
 }
 
-fn run(myhandler: &mut dyn handler::Handler){
+fn run(myhandler: Box< dyn handler::Handler>){
 }
 
 // fn run(myhandler: &mut dyn handler::Handler){
