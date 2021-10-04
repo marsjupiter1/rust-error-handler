@@ -4,12 +4,12 @@ use crate::handler::Handler;
 
 struct EventHandler<'a>{
     handler_name: &'a str,
-    chained_handler: Box<dyn handler::Handler>,
+    chained_handler: &'a Box<dyn handler::Handler>,
     error_count: u32,
 }
 
-impl  EventHandler<'_>{
-    pub fn chained(id:&str,h: Box<dyn handler::Handler>) -> Box<dyn handler::Handler+ '_>{
+impl  <'a>EventHandler<'a>{
+    pub fn chained(id:&'a str,h: &'a mut Box<dyn handler::Handler>) -> Box<dyn handler::Handler+ 'a>{
         Box::new(EventHandler{handler_name: id,chained_handler:h,error_count:0})
     }
 
@@ -49,7 +49,7 @@ impl  handler::Handler for EventHandler<'_>{
 
 }
 
-pub fn check_door(h:Box<dyn handler::Handler>) -> Option<handler::HandlerError>{
+pub fn check_door(mut h:&mut Box<dyn  handler::Handler>) -> Option<handler::HandlerError>{
         
     println!("check door");
     let mut ch = EventHandler::chained("check_door",h);

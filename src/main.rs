@@ -64,16 +64,16 @@ impl handler::Handler for EventHandler{
 
 fn main(){
 
-    let h = EventHandler::new()  ;
+    let mut h = EventHandler::new()  ;
    
-    run(h);
+    run(&h);
 
 }
 
-fn run(myhandler: Box< dyn handler::Handler>){
+fn run(mut myhandler:  &Box<dyn  handler::Handler>){
 
 
-    let mut err = door::check_door(myhandler);
+    let mut err = door::check_door(&myhandler.borrow_mut());
  
     err = myhandler.handle(handler::ERROR,err,"main check door failed".to_string());
 
