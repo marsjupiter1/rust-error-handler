@@ -8,7 +8,7 @@ pub struct HandlerError{
 }   
 
 pub trait Handler{
-    fn name(&self) ->String;
+    fn name(&self) -> &str;
     fn handle(&mut self,level:u32,err: Option<HandlerError>,message:String) 
         -> Option<HandlerError>{
         println!("BaseHandler {} {} in {}",level,message,self.name());
