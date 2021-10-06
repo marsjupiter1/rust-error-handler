@@ -9,7 +9,7 @@ struct EventHandler<'a>{
 }
 
 impl  <'a>EventHandler<'a>{
-    pub fn chained(id:&'a str,h: &'a mut Box<dyn handler::Handler>) -> Box<dyn handler::Handler+ 'a>{
+    pub fn chained(id:&'a str,h: &'a  Box<dyn handler::Handler>) -> Box<dyn handler::Handler+ 'a>{
         Box::new(EventHandler{handler_name: id,chained_handler:h,error_count:0})
     }
 
@@ -49,10 +49,10 @@ impl  handler::Handler for EventHandler<'_>{
 
 }
 
-pub fn check_door(mut h:&mut Box<dyn  handler::Handler>) -> Option<handler::HandlerError>{
+pub fn check_door(h:&Box<dyn  handler::Handler>) -> Option<handler::HandlerError>{
         
     println!("check door");
-    let mut ch = EventHandler::chained("check_door",h);
+    let  ch = EventHandler::chained("check_door",h);
     let mut err = open_door();
 
     if err.is_some(){

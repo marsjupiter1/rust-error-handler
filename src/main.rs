@@ -13,7 +13,6 @@ struct EventHandler{
 
 impl EventHandler{
     pub fn new() ->  Box<dyn handler::Handler>{
-//pub fn newdoorhandler() ->  Box<dyn Mandler>{
         Box::new(EventHandler{ })
     }
 }
@@ -64,16 +63,16 @@ impl handler::Handler for EventHandler{
 
 fn main(){
 
-    let mut h = EventHandler::new()  ;
+    let  h = EventHandler::new()  ;
    
     run(&h);
 
 }
 
-fn run(mut myhandler:  &Box<dyn  handler::Handler>){
+fn run(myhandler:  &Box<dyn  handler::Handler>){
 
 
-    let mut err = door::check_door(&myhandler.borrow_mut());
+    let mut err = door::check_door(myhandler);
  
     err = myhandler.handle(handler::ERROR,err,"main check door failed".to_string());
 
